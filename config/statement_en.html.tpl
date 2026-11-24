@@ -86,15 +86,16 @@
           <!-- END -->
         </li>
       </ol>
-      <!-- BEGIN level1 -->
-      <p><b>Unexecutable Actions:</b> Syntactically valid actions that cannot be executed (such as <action>MOVE</action> outside the grid or toward an obstacle or occupied tile) are simply ignored and do not cause defeat.</p>
-      <!-- END -->
-      <!-- BEGIN level2 -->
-      <p><b>Unexecutable Actions:</b> Syntactically valid actions that cannot be executed (such as <action>MOVE</action> outside the grid or toward an obstacle or occupied tile, or <action>BOMB</action> while <var>cooldown</var> &gt; <const>0</const> or out of range) are simply ignored and do not cause defeat. Targeting a pillar or void tile with <action>BOMB</action> within range while <var>cooldown</var> = <const>0</const> has no effect on the tile but still triggers the <const>2</const>-turn cooldown.</p>
-      <!-- END -->
-      <!-- BEGIN level3 -->
-      <p><b>Unexecutable Actions:</b> Syntactically valid actions that cannot be executed (such as <action>MOVE</action> outside the grid or toward an obstacle or occupied tile, or <action>BOMB</action>/<action>PUSH</action> while <var>cooldown</var> &gt; <const>0</const> or out of range) are simply ignored and do not cause defeat. Targeting a pillar or void tile with <action>BOMB</action> (within range) or an empty tile with <action>PUSH</action> (at Manhattan distance <const>1</const>) while <var>cooldown</var> = <const>0</const> has no board effect, but still triggers the <const>2</const>-turn cooldown.</p>
-      <!-- END -->
+      <p><b>Unexecutable Actions:</b> Syntactically valid actions that cannot be executed do not cause defeat:</p>
+      <ul>
+        <li><action>MOVE</action> outside the grid, to an adjacent void (<const>0</const>) or pillar (<const>#</const>) tile, or to a tile occupied by a friendly or opposing unit that does not vacate it: ignored (the unit stays in place).</li>
+        <!-- BEGIN level2 level3 -->
+        <li><action>BOMB</action> while <var>cooldown</var> &gt; <const>0</const>, outside the grid, or outside Manhattan distance <const>1</const>&ndash;<const>2</const>: ignored (does not trigger cooldown). Targeting a pillar (<const>#</const>) or void (<const>0</const>) tile within range while <var>cooldown</var> = <const>0</const> has no effect on the tile, but still sets <var>cooldown</var> to <const>2</const>.</li>
+        <!-- END -->
+        <!-- BEGIN level3 -->
+        <li><action>PUSH</action> while <var>cooldown</var> &gt; <const>0</const> or not at Manhattan distance <const>1</const>: ignored (does not trigger cooldown). Targeting a tile with no unit at Manhattan distance <const>1</const> while <var>cooldown</var> = <const>0</const> has no board effect, but still sets <var>cooldown</var> to <const>2</const>. Pushing a unit into a pillar (<const>#</const>) or another unit is valid (as described above, the target stays in place and its <var>cooldown</var> increases by <const>2</const>).</li>
+        <!-- END -->
+      </ul>
 
       <!-- VICTORY CONDITIONS -->
       <div class="statement-victory-conditions">
@@ -214,14 +215,21 @@
     </div>
   </div>
 
-  <!-- SOURCE CODE & CREDITS -->
+  <!-- SOURCE CODE -->
   <div class="statement-section statement-examples">
-    <h1><span class="icon icon-example">&nbsp;</span><span>Source Code &amp; Credits</span></h1>
+    <h1><span class="icon icon-example">&nbsp;</span><span>Source Code</span></h1>
     <div class="statement-examples-text">
       <p>The referee, viewer, and starter bots source code is available on GitHub:
         <a href="https://github.com/CGphilRG/codingame-chrono-tactics" target="_blank" rel="noopener noreferrer">https://github.com/CGphilRG/codingame-chrono-tactics</a>
       </p>
-      <p><b>Credits &amp; Inspiration:</b> Original puzzle design inspired by classic turn-based tactical grid games (notably <i>Into the Breach</i> for positional push tactics and shrinking-arena mechanics). Built with the official CodinGame Game Engine SDK.</p>
+    </div>
+  </div>
+
+  <!-- CREDITS -->
+  <div class="statement-section statement-examples">
+    <h1><span class="icon icon-example">&nbsp;</span><span>Credits</span></h1>
+    <div class="statement-examples-text">
+      <p>Original puzzle concept inspired by classic turn-based tactical grid games, notably <i>Into the Breach</i> by <b>Subset Games</b> (positional push mechanics and environmental hazards) and shrinking-arena tactical games. Built with the official <b>CodinGame Game Engine SDK</b>.</p>
     </div>
   </div>
 </div>

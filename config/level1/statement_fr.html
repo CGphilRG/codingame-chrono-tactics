@@ -34,7 +34,10 @@
           </ul>
         </li>
       </ol>
-      <p><b>Actions inexécutables :</b> Les commandes syntaxiquement valides mais inexécutables (par exemple <action>MOVE</action> hors grille ou vers un obstacle/case occupée) sont simplement ignorées et n'entraînent pas la défaite.</p>
+      <p><b>Actions inexécutables :</b> Les actions syntaxiquement valides qui ne peuvent pas être exécutées n'entraînent pas la défaite :</p>
+      <ul>
+        <li><action>MOVE</action> hors de la grille, vers une case vide (<const>0</const>) ou un pilier (<const>#</const>) adjacent, ou vers une case occupée par une unité alliée ou adverse qui ne libère pas la case : ignoré (l'unité reste sur place).</li>
+      </ul>
 
       <!-- VICTORY CONDITIONS -->
       <div class="statement-victory-conditions">
@@ -116,14 +119,21 @@
     </div>
   </div>
 
-  <!-- CODE SOURCE & CRÉDITS -->
+  <!-- CODE SOURCE -->
   <div class="statement-section statement-examples">
-    <h1><span class="icon icon-example">&nbsp;</span><span>Code Source &amp; Crédits</span></h1>
+    <h1><span class="icon icon-example">&nbsp;</span><span>Code Source</span></h1>
     <div class="statement-examples-text">
       <p>Le code source complet de l'arbitre (Referee), du viewer et des bots de référence est disponible sur GitHub :
         <a href="https://github.com/CGphilRG/codingame-chrono-tactics" target="_blank" rel="noopener noreferrer">https://github.com/CGphilRG/codingame-chrono-tactics</a>
       </p>
-      <p><b>Crédits &amp; Inspiration :</b> Conception originale inspirée des jeux tactiques au tour par tour sur grille (notamment <i>Into the Breach</i> pour les mécaniques de poussée et d'arène qui se rétrécit). Développé avec le SDK officiel CodinGame Game Engine.</p>
+    </div>
+  </div>
+
+  <!-- CRÉDITS -->
+  <div class="statement-section statement-examples">
+    <h1><span class="icon icon-example">&nbsp;</span><span>Crédits</span></h1>
+    <div class="statement-examples-text">
+      <p>Conception originale inspirée des jeux tactiques au tour par tour sur grille, notamment <i>Into the Breach</i> de <b>Subset Games</b> (mécaniques de poussée positionnelle et dangers environnementaux) et des jeux d'arène qui se rétrécit. Développé avec le SDK officiel <b>CodinGame Game Engine</b>.</p>
     </div>
   </div>
 </div>
