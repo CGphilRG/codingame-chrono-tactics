@@ -196,16 +196,16 @@
       <div class="text">
         <var>width</var> = <const>11</const>, <var>height</var> = <const>11</const><br>
         <!-- BEGIN level1 -->
-        <var>unitCount</var> = <const>2</const><br>
-        <var>beaconCount</var> = <const>7</const><br>
+        <var>unitCount</var> = <const>2</const> (<const>1</const> par joueur, fixe)<br>
+        <var>beaconCount</var> = <const>7</const> (fixe)<br>
         <!-- END -->
         <!-- BEGIN level2 -->
-        <const>2</const> &le; <var>unitCount</var> &le; <const>4</const><br>
-        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const><br>
+        <const>2</const> &le; <var>unitCount</var> &le; <const>4</const> (fixe à <const>4</const> au départ : <const>2</const> par joueur)<br>
+        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const> (fixe à <const>7</const> au départ)<br>
         <!-- END -->
         <!-- BEGIN level3 -->
-        <const>2</const> &le; <var>unitCount</var> &le; <const>6</const><br>
-        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const><br>
+        <const>2</const> &le; <var>unitCount</var> &le; <const>6</const> (fixe à <const>6</const> au départ : <const>3</const> par joueur)<br>
+        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const> (fixe à <const>7</const> au départ)<br>
         <!-- END -->
         Temps de réponse pour le premier tour &le; <const>1000</const> ms<br>
         Temps de réponse par tour &le; <const>50</const> ms<br>

@@ -196,16 +196,16 @@
       <div class="text">
         <var>width</var> = <const>11</const>, <var>height</var> = <const>11</const><br>
         <!-- BEGIN level1 -->
-        <var>unitCount</var> = <const>2</const><br>
-        <var>beaconCount</var> = <const>7</const><br>
+        <var>unitCount</var> = <const>2</const> (<const>1</const> per player, fixed)<br>
+        <var>beaconCount</var> = <const>7</const> (fixed)<br>
         <!-- END -->
         <!-- BEGIN level2 -->
-        <const>2</const> &le; <var>unitCount</var> &le; <const>4</const><br>
-        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const><br>
+        <const>2</const> &le; <var>unitCount</var> &le; <const>4</const> (fixed at <const>4</const> at start: <const>2</const> per player)<br>
+        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const> (fixed at <const>7</const> at start)<br>
         <!-- END -->
         <!-- BEGIN level3 -->
-        <const>2</const> &le; <var>unitCount</var> &le; <const>6</const><br>
-        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const><br>
+        <const>2</const> &le; <var>unitCount</var> &le; <const>6</const> (fixed at <const>6</const> at start: <const>3</const> per player)<br>
+        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const> (fixed at <const>7</const> at start)<br>
         <!-- END -->
         Response time for first turn &le; <const>1000</const> ms<br>
         Response time for one turn &le; <const>50</const> ms<br>
