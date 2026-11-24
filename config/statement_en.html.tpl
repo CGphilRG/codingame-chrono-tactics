@@ -219,7 +219,7 @@
     <h1><span class="icon icon-example">&nbsp;</span><span>Source Code &amp; Credits</span></h1>
     <div class="statement-examples-text">
       <p>The referee, viewer, and starter bots source code is available on GitHub:
-        <a href="https://github.com/codingame-team/codingame-chrono-tactics" target="_blank" rel="noopener noreferrer">https://github.com/codingame-team/codingame-chrono-tactics</a>
+        <a href="https://github.com/CGphilRG/codingame-chrono-tactics" target="_blank" rel="noopener noreferrer">https://github.com/CGphilRG/codingame-chrono-tactics</a>
       </p>
       <p><b>Credits &amp; Inspiration:</b> Original puzzle design inspired by classic turn-based tactical grid games (notably <i>Into the Breach</i> for positional push tactics and shrinking-arena mechanics). Built with the official CodinGame Game Engine SDK.</p>
     </div>

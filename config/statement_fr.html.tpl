@@ -219,7 +219,7 @@
     <h1><span class="icon icon-example">&nbsp;</span><span>Code Source &amp; Crédits</span></h1>
     <div class="statement-examples-text">
       <p>Le code source complet de l'arbitre (Referee), du viewer et des bots de référence est disponible sur GitHub :
-        <a href="https://github.com/codingame-team/codingame-chrono-tactics" target="_blank" rel="noopener noreferrer">https://github.com/codingame-team/codingame-chrono-tactics</a>
+        <a href="https://github.com/CGphilRG/codingame-chrono-tactics" target="_blank" rel="noopener noreferrer">https://github.com/CGphilRG/codingame-chrono-tactics</a>
       </p>
       <p><b>Crédits &amp; Inspiration :</b> Conception originale inspirée des jeux tactiques au tour par tour sur grille (notamment <i>Into the Breach</i> pour les mécaniques de poussée et d'arène qui se rétrécit). Développé avec le SDK officiel CodinGame Game Engine.</p>
     </div>
