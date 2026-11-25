@@ -2,7 +2,7 @@
 <div class="statement-body">
   <!-- LEAGUE ALERT -->
   <div style="color: #7cc576; background-color: rgba(124, 197, 118,.1); padding: 20px; margin-bottom: 15px; text-align: left">
-    <p style="margin-bottom: 0"><b>Wood 3 League:</b> Command <b>1 unit</b> to capture Chrono-Beacons across the arena. Special tactical abilities will unlock in higher divisions.</p>
+    <p style="margin-bottom: 0"><b>Wood 3 League:</b> Command <b>1 unit</b> to capture Chrono-Beacons across a <const>9</const>&times;<const>9</const>, <const>11</const>&times;<const>9</const>, or <const>11</const>&times;<const>11</const> arena. Special tactical abilities will unlock in higher divisions.</p>
   </div>
 
   <!-- GOAL -->
@@ -17,7 +17,7 @@
   <div class="statement-section statement-rules">
     <h1><span class="icon icon-rules">&nbsp;</span><span>Rules</span></h1>
     <div class="statement-rules-content">
-      <p>The game is played on a rotationally symmetric <const>11</const>&times;<const>11</const> grid. Coordinates follow the standard grid convention: <var>x</var> increases to the right, <var>y</var> increases downwards, and <const>(0, 0)</const> is the top-left corner. Each tile is one of:</p>
+      <p>The game is played on a rotationally symmetric odd-sized <var>width</var>&times;<var>height</var> grid. Coordinates follow the standard grid convention: <var>x</var> increases to the right, <var>y</var> increases downwards, and <const>(0, 0)</const> is the top-left corner. Each tile is one of:</p>
       <ul>
         <li><const>0</const>: Void abyss (impassable; units cannot voluntarily move onto a <const>0</const> tile).</li>
         <li><const>1</const>, <const>2</const>, <const>3</const>: Walkable floor tile (tile integrity values have no effect in Wood 3, as tiles do not crumble in this division).</li>
@@ -74,7 +74,7 @@
     <div class="blk">
       <div class="title">Initialization Input</div>
       <div class="text">
-        <p><span class="statement-lineno">Line 1:</span> 3 space-separated integers <var>width</var>, <var>height</var> and <var>leagueLevel</var>, the width and height of the grid (<const>11</const>&times;<const>11</const>) and the current Wood division (<const>3</const> for Wood 3, <const>2</const> for Wood 2, <const>1</const> for Wood 1).</p>
+        <p><span class="statement-lineno">Line 1:</span> 3 space-separated integers <var>width</var>, <var>height</var> and <var>leagueLevel</var>, the width and height of the grid and the current Wood division (<const>3</const> for Wood 3, <const>2</const> for Wood 2, <const>1</const> for Wood 1).</p>
       </div>
     </div>
     <div class="blk">
@@ -109,9 +109,9 @@
     <div class="blk">
       <div class="title">Constraints</div>
       <div class="text">
-        <var>width</var> = <const>11</const>, <var>height</var> = <const>11</const><br>
+        <var>width</var> &isin; {<const>9</const>, <const>11</const>}, <var>height</var> &isin; {<const>9</const>, <const>11</const>} (<const>9</const>&times;<const>9</const>, <const>11</const>&times;<const>9</const>, or <const>11</const>&times;<const>11</const>)<br>
         <var>unitCount</var> = <const>2</const> (<const>1</const> per player, fixed)<br>
-        <var>beaconCount</var> = <const>7</const> (fixed)<br>
+        <var>beaconCount</var> &isin; {<const>5</const>, <const>7</const>} (<const>5</const> on <const>9</const>&times;<const>9</const>, <const>7</const> on <const>11</const>&times;<const>9</const> / <const>11</const>&times;<const>11</const>, fixed during the match)<br>
         Response time for first turn &le; <const>1000</const> ms<br>
         Response time for one turn &le; <const>50</const> ms<br>
         Maximum number of turns: <const>120</const>

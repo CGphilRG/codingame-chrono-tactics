@@ -4,17 +4,17 @@
   <!-- LEAGUE ALERT -->
   <!-- BEGIN level1 -->
   <div style="color: #7cc576; background-color: rgba(124, 197, 118,.1); padding: 20px; margin-bottom: 15px; text-align: left">
-    <p style="margin-bottom: 0"><b>Ligue Bois 3 :</b> Contrôlez <b>1 unité</b> pour capturer les Chrono-Balises de l'arène. Des compétences tactiques spéciales seront débloquées dans les divisions supérieures.</p>
+    <p style="margin-bottom: 0"><b>Ligue Bois 3 :</b> Contrôlez <b>1 unité</b> pour capturer les Chrono-Balises sur une arène <const>9</const>&times;<const>9</const>, <const>11</const>&times;<const>9</const> ou <const>11</const>&times;<const>11</const>. Des compétences tactiques spéciales seront débloquées dans les divisions supérieures.</p>
   </div>
   <!-- END -->
   <!-- BEGIN level2 -->
   <div style="color: #7cc576; background-color: rgba(124, 197, 118,.1); padding: 20px; margin-bottom: 15px; text-align: left">
-    <p style="margin-bottom: 0"><b>Ligue Bois 2 :</b> Vous contrôlez désormais <b>2 unités</b> et débloquez l'action <action>BOMB</action> (portée &le; <const>2</const>, recharge <const>2</const> tours) pour dégrader les cases et faire s'effondrer les ponts !</p>
+    <p style="margin-bottom: 0"><b>Ligue Bois 2 :</b> Vous contrôlez désormais <b>2 unités</b> sur des arènes plus vastes (jusqu'à <const>13</const>&times;<const>11</const>) et débloquez l'action <action>BOMB</action> (portée &le; <const>2</const>, recharge <const>2</const> tours) pour dégrader les cases et faire s'effondrer les ponts !</p>
   </div>
   <!-- END -->
   <!-- BEGIN level3 -->
   <div style="color: #7cc576; background-color: rgba(124, 197, 118,.1); padding: 20px; margin-bottom: 15px; text-align: left">
-    <p style="margin-bottom: 0"><b>Ligue Bois 1 :</b> Vous contrôlez désormais <b>3 unités</b>, débloquez l'action <action>PUSH</action> (portée <const>1</const>, recharge <const>2</const> tours) pour pousser les unités adjacentes dans l'abîme, et l'anneau extérieur de l'arène se dégrade tous les <const>20</const> tours !</p>
+    <p style="margin-bottom: 0"><b>Ligue Bois 1 :</b> Vous contrôlez désormais <b>2 à 4 unités</b> (selon la taille de l'arène, jusqu'à <const>13</const>&times;<const>13</const>), débloquez l'action <action>PUSH</action> (portée <const>1</const>, recharge <const>2</const> tours) pour pousser les unités adjacentes dans l'abîme, et l'anneau extérieur de l'arène se dégrade tous les <const>20</const> tours !</p>
   </div>
   <!-- END -->
 
@@ -35,7 +35,7 @@
   <div class="statement-section statement-rules">
     <h1><span class="icon icon-rules">&nbsp;</span><span>Règles</span></h1>
     <div class="statement-rules-content">
-      <p>La partie se déroule sur une grille <const>11</const>&times;<const>11</const> à symétrie centrale. Les coordonnées suivent la convention standard : <var>x</var> croît vers la droite, <var>y</var> croît vers le bas et <const>(0, 0)</const> correspond au coin supérieur gauche. Chaque case possède l'un des états suivants :</p>
+      <p>La partie se déroule sur une grille de dimensions impaires <var>width</var>&times;<var>height</var> à symétrie centrale. Les coordonnées suivent la convention standard : <var>x</var> croît vers la droite, <var>y</var> croît vers le bas et <const>(0, 0)</const> correspond au coin supérieur gauche. Chaque case possède l'un des états suivants :</p>
       <ul>
         <!-- BEGIN level1 -->
         <li><const>0</const> : Gouffre / Vide (infranchissable ; les unités ne peuvent pas s'y déplacer volontairement).</li>
@@ -64,7 +64,7 @@
         <li><b>Démolition de Case (<action>BOMB</action> <var>tx</var> <var>ty</var>) :</b> Si <var>cooldown</var> vaut <const>0</const> et que la distance de Manhattan de l'unité agissante vers (<var>tx</var>, <var>ty</var>) vaut <const>1</const> ou <const>2</const>, réduit de <const>1</const> l'intégrité de la case (<var>tx</var>, <var>ty</var>) et passe le <var>cooldown</var> de l'unité à <const>2</const>. Si plusieurs unités bombardent la même case au même tour, les réductions d'intégrité se cumulent. Si l'intégrité tombe à <const>0</const>, la case s'effondre dans le vide : toute balise dessus est détruite et toute unité qui s'y trouve est <b>éliminée</b> !</li>
         <!-- END -->
         <!-- BEGIN level3 -->
-        <li><b>Tempête Temporelle (Effondrement Annulaire) :</b> Tous les <const>20</const> tours (tours <const>20</const>, <const>40</const>, <const>60</const> et <const>80</const>), l'anneau extérieur actif de l'arène se dégrade. Un anneau de rayon <var>r</var> regroupe toutes les cases dont la distance de Tchebychev au centre (<const>5</const>, <const>5</const>) vaut <const>max(|x - 5|, |y - 5|) = r</const>, en commençant à <var>r</var> = <const>5</const> au tour <const>20</const> puis en rétrécissant de <const>1</const> tous les <const>20</const> tours (<var>r</var> = <const>5, 4, 3, 2</const>). Sur cet anneau :
+        <li><b>Tempête Temporelle (Effondrement Annulaire) :</b> Tous les <const>20</const> tours (à partir du tour <const>20</const>), l'anneau extérieur actif de l'arène se dégrade. Un anneau de profondeur <var>k</var> regroupe toutes les cases telles que <const>min(x, width - 1 - x, y, height - 1 - y) = k</const>, en commençant à <var>k</var> = <const>0</const> au tour <const>20</const> puis en augmentant de <const>1</const> tous les <const>20</const> tours jusqu'à <var>k</var> = <const>min(width, height) / 2 - 2</const> (<const>3</const> vagues pour hauteur <const>9</const>, <const>4</const> vagues pour hauteur <const>11</const>, et <const>5</const> vagues jusqu'au tour <const>100</const> sur <const>13</const>&times;<const>13</const>, en préservant toujours un sanctuaire central d'au moins <const>3</const>&times;<const>3</const> cases). Sur cet anneau :
           <ul>
             <li>Chaque case praticable (<const>1</const>&ndash;<const>3</const>) perd <const>1</const> point d'intégrité et s'effondre dans le vide (<const>0</const>) si elle atteint <const>0</const>.</li>
             <li>Chaque pilier (<const>#</const>) est fissuré par la tempête et devient une case praticable d'intégrité <const>1</const>.</li>
@@ -137,7 +137,7 @@
     <div class="blk">
       <div class="title">Entrées d'Initialisation</div>
       <div class="text">
-        <p><span class="statement-lineno">Ligne 1 :</span> 3 entiers séparés par des espaces <var>width</var>, <var>height</var> et <var>leagueLevel</var>, la largeur et la hauteur de la grille (<const>11</const>&times;<const>11</const>) ainsi que la division Bois actuelle (<const>3</const> pour Bois 3, <const>2</const> pour Bois 2, <const>1</const> pour Bois 1).</p>
+        <p><span class="statement-lineno">Ligne 1 :</span> 3 entiers séparés par des espaces <var>width</var>, <var>height</var> et <var>leagueLevel</var>, la largeur et la hauteur de la grille ainsi que la division Bois actuelle (<const>3</const> pour Bois 3, <const>2</const> pour Bois 2, <const>1</const> pour Bois 1).</p>
       </div>
     </div>
     <div class="blk">
@@ -195,18 +195,20 @@
     <div class="blk">
       <div class="title">Contraintes</div>
       <div class="text">
-        <var>width</var> = <const>11</const>, <var>height</var> = <const>11</const><br>
         <!-- BEGIN level1 -->
+        <var>width</var> &isin; {<const>9</const>, <const>11</const>}, <var>height</var> &isin; {<const>9</const>, <const>11</const>} (<const>9</const>&times;<const>9</const>, <const>11</const>&times;<const>9</const> ou <const>11</const>&times;<const>11</const>)<br>
         <var>unitCount</var> = <const>2</const> (<const>1</const> par joueur, fixe)<br>
-        <var>beaconCount</var> = <const>7</const> (fixe)<br>
+        <var>beaconCount</var> &isin; {<const>5</const>, <const>7</const>} (<const>5</const> sur <const>9</const>&times;<const>9</const>, <const>7</const> sur <const>11</const>&times;<const>9</const> / <const>11</const>&times;<const>11</const>, fixe pendant la partie)<br>
         <!-- END -->
         <!-- BEGIN level2 -->
+        <var>width</var> &isin; {<const>9</const>, <const>11</const>, <const>13</const>}, <var>height</var> &isin; {<const>9</const>, <const>11</const>} (<const>9</const>&times;<const>9</const>, <const>11</const>&times;<const>9</const>, <const>11</const>&times;<const>11</const>, <const>13</const>&times;<const>9</const> ou <const>13</const>&times;<const>11</const>)<br>
         <const>2</const> &le; <var>unitCount</var> &le; <const>4</const> (fixe à <const>4</const> au départ : <const>2</const> par joueur)<br>
-        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const> (fixe à <const>7</const> au départ)<br>
+        <const>0</const> &le; <var>beaconCount</var> &le; <const>9</const> (démarre à <const>5</const>, <const>7</const> ou <const>9</const> selon la taille de l'arène)<br>
         <!-- END -->
         <!-- BEGIN level3 -->
-        <const>2</const> &le; <var>unitCount</var> &le; <const>6</const> (fixe à <const>6</const> au départ : <const>3</const> par joueur)<br>
-        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const> (fixe à <const>7</const> au départ)<br>
+        <var>width</var> &isin; {<const>9</const>, <const>11</const>, <const>13</const>}, <var>height</var> &isin; {<const>9</const>, <const>11</const>, <const>13</const>} (<const>9</const>&times;<const>9</const>, <const>11</const>&times;<const>9</const>, <const>11</const>&times;<const>11</const>, <const>13</const>&times;<const>9</const>, <const>13</const>&times;<const>11</const> ou <const>13</const>&times;<const>13</const>)<br>
+        <const>2</const> &le; <var>unitCount</var> &le; <const>8</const> (démarre à <const>4</const>, <const>6</const> ou <const>8</const> selon la taille de l'arène : <const>2</const>, <const>3</const> ou <const>4</const> par joueur)<br>
+        <const>0</const> &le; <var>beaconCount</var> &le; <const>9</const> (démarre à <const>5</const>, <const>7</const> ou <const>9</const> selon la taille de l'arène)<br>
         <!-- END -->
         Temps de réponse pour le premier tour &le; <const>1000</const> ms<br>
         Temps de réponse par tour &le; <const>50</const> ms<br>

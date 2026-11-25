@@ -2,7 +2,7 @@
 <div class="statement-body">
   <!-- LEAGUE ALERT -->
   <div style="color: #7cc576; background-color: rgba(124, 197, 118,.1); padding: 20px; margin-bottom: 15px; text-align: left">
-    <p style="margin-bottom: 0"><b>Wood 1 League:</b> You now command <b>3 units</b>, unlock the <action>PUSH</action> ability (range <const>1</const>, cooldown <const>2</const>) to knock adjacent units into the abyss, and the outer ring of the arena degrades every <const>20</const> turns!</p>
+    <p style="margin-bottom: 0"><b>Wood 1 League:</b> You now command <b>2 to 4 units</b> (scaling with arena size, up to <const>13</const>&times;<const>13</const>), unlock the <action>PUSH</action> ability (range <const>1</const>, cooldown <const>2</const>) to knock adjacent units into the abyss, and the outer ring of the arena degrades every <const>20</const> turns!</p>
   </div>
 
   <!-- GOAL -->
@@ -17,7 +17,7 @@
   <div class="statement-section statement-rules">
     <h1><span class="icon icon-rules">&nbsp;</span><span>Rules</span></h1>
     <div class="statement-rules-content">
-      <p>The game is played on a rotationally symmetric <const>11</const>&times;<const>11</const> grid. Coordinates follow the standard grid convention: <var>x</var> increases to the right, <var>y</var> increases downwards, and <const>(0, 0)</const> is the top-left corner. Each tile is one of:</p>
+      <p>The game is played on a rotationally symmetric odd-sized <var>width</var>&times;<var>height</var> grid. Coordinates follow the standard grid convention: <var>x</var> increases to the right, <var>y</var> increases downwards, and <const>(0, 0)</const> is the top-left corner. Each tile is one of:</p>
       <ul>
         <li><const>0</const>: Void abyss (impassable; units cannot voluntarily move onto a <const>0</const> tile, and any unit ending up on a <const>0</const> tile is eliminated).</li>
         <li><const>1</const>, <const>2</const>, <const>3</const>: Walkable floor tile with its current structural integrity.</li>
@@ -35,7 +35,7 @@
           Because all pushes are validated before effects are applied, if two adjacent units push each other on the same turn, both pushes are executed (and if either is slammed into an obstacle, its <var>cooldown</var> increases from <const>2</const> to <const>4</const>).
         </li>
         <li><b>Tile Demolition (<action>BOMB</action> <var>tx</var> <var>ty</var>):</b> If <var>cooldown</var> is <const>0</const> and the acting unit's Manhattan distance to (<var>tx</var>, <var>ty</var>) is <const>1</const> or <const>2</const>, reduces the integrity of floor tile (<var>tx</var>, <var>ty</var>) by <const>1</const> and sets the acting unit's <var>cooldown</var> to <const>2</const>. If multiple units bomb the same tile on the same turn, the integrity reductions are cumulative. If integrity reaches <const>0</const>, the tile collapses into void: any beacon on it is destroyed and any unit standing on it is <b>eliminated</b>!</li>
-        <li><b>Chrono-Storm Ring Collapse:</b> Every <const>20</const> turns (turns <const>20</const>, <const>40</const>, <const>60</const>, and <const>80</const>), the outermost active ring of the arena degrades. A ring at radius <var>r</var> consists of all tiles whose Chebyshev distance from the center (<const>5</const>, <const>5</const>) is <const>max(|x - 5|, |y - 5|) = r</const>, starting at <var>r</var> = <const>5</const> on turn <const>20</const> and shrinking inward by <const>1</const> every <const>20</const> turns (<var>r</var> = <const>5, 4, 3, 2</const>). On that ring:
+        <li><b>Chrono-Storm Ring Collapse:</b> Every <const>20</const> turns (starting at turn <const>20</const>), the outermost active ring of the arena degrades. A ring at edge-depth <var>k</var> consists of all tiles with <const>min(x, width - 1 - x, y, height - 1 - y) = k</const>, starting at <var>k</var> = <const>0</const> on turn <const>20</const> and increasing by <const>1</const> every <const>20</const> turns up to <var>k</var> = <const>min(width, height) / 2 - 2</const> (<const>3</const> waves on height <const>9</const>, <const>4</const> waves on height <const>11</const>, and <const>5</const> waves up to turn <const>100</const> on <const>13</const>&times;<const>13</const>, preserving a central sanctuary of at least <const>3</const>&times;<const>3</const> tiles). On that ring:
           <ul>
             <li>Each floor tile (<const>1</const>&ndash;<const>3</const>) loses <const>1</const> integrity, collapsing into void (<const>0</const>) if it reaches <const>0</const>.</li>
             <li>Each pillar (<const>#</const>) is cracked by the storm and turns into a walkable floor tile of integrity <const>1</const>.</li>
@@ -91,7 +91,7 @@
     <div class="blk">
       <div class="title">Initialization Input</div>
       <div class="text">
-        <p><span class="statement-lineno">Line 1:</span> 3 space-separated integers <var>width</var>, <var>height</var> and <var>leagueLevel</var>, the width and height of the grid (<const>11</const>&times;<const>11</const>) and the current Wood division (<const>3</const> for Wood 3, <const>2</const> for Wood 2, <const>1</const> for Wood 1).</p>
+        <p><span class="statement-lineno">Line 1:</span> 3 space-separated integers <var>width</var>, <var>height</var> and <var>leagueLevel</var>, the width and height of the grid and the current Wood division (<const>3</const> for Wood 3, <const>2</const> for Wood 2, <const>1</const> for Wood 1).</p>
       </div>
     </div>
     <div class="blk">
@@ -131,9 +131,9 @@
     <div class="blk">
       <div class="title">Constraints</div>
       <div class="text">
-        <var>width</var> = <const>11</const>, <var>height</var> = <const>11</const><br>
-        <const>2</const> &le; <var>unitCount</var> &le; <const>6</const> (fixed at <const>6</const> at start: <const>3</const> per player)<br>
-        <const>0</const> &le; <var>beaconCount</var> &le; <const>7</const> (fixed at <const>7</const> at start)<br>
+        <var>width</var> &isin; {<const>9</const>, <const>11</const>, <const>13</const>}, <var>height</var> &isin; {<const>9</const>, <const>11</const>, <const>13</const>} (<const>9</const>&times;<const>9</const>, <const>11</const>&times;<const>9</const>, <const>11</const>&times;<const>11</const>, <const>13</const>&times;<const>9</const>, <const>13</const>&times;<const>11</const>, or <const>13</const>&times;<const>13</const>)<br>
+        <const>2</const> &le; <var>unitCount</var> &le; <const>8</const> (starts at <const>4</const>, <const>6</const>, or <const>8</const> depending on arena size: <const>2</const>, <const>3</const>, or <const>4</const> per player)<br>
+        <const>0</const> &le; <var>beaconCount</var> &le; <const>9</const> (starts at <const>5</const>, <const>7</const>, or <const>9</const> depending on arena size)<br>
         Response time for first turn &le; <const>1000</const> ms<br>
         Response time for one turn &le; <const>50</const> ms<br>
         Maximum number of turns: <const>120</const>

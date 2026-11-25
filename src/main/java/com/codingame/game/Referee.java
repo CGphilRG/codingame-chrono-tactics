@@ -23,9 +23,6 @@ import com.google.inject.Inject;
 
 public class Referee extends AbstractReferee {
     private static final int MAX_TURNS = 120;
-    private static final int CELL_SIZE = 76;
-    private static final int BOARD_ORIGIN_X = (1920 - Grid.WIDTH * CELL_SIZE) / 2;
-    private static final int BOARD_ORIGIN_Y = (1080 - Grid.HEIGHT * CELL_SIZE) / 2 + 25;
     private static final int ACTION_COOLDOWN = 2;
     private static final int BOMB_RANGE = 2;
 
@@ -45,7 +42,11 @@ public class Referee extends AbstractReferee {
     private Sprite fxExplosionPool;
     private Sprite fxPushPool;
     private int leagueLevel;
-    private int collapseRing = 5;
+    private int cellSize = 76;
+    private int boardOriginX;
+    private int boardOriginY;
+    private int collapseLayer = 0;
+    private int maxCollapseLayer = 3;
 
     @Override
     public void init() {
@@ -60,6 +61,14 @@ public class Referee extends AbstractReferee {
         List<int[]> p0Spawns = new ArrayList<>();
         List<int[]> p1Spawns = new ArrayList<>();
         grid.generate(rng, leagueLevel, p0Spawns, p1Spawns);
+
+        int w = grid.getWidth();
+        int h = grid.getHeight();
+        cellSize = Math.min(92, Math.min(1040 / w, 860 / h));
+        boardOriginX = (1920 - w * cellSize) / 2;
+        boardOriginY = (1080 - h * cellSize) / 2 + 25;
+        collapseLayer = 0;
+        maxCollapseLayer = Math.min(w, h) / 2 - 2;
 
         Player p0 = gameManager.getPlayer(0);
         Player p1 = gameManager.getPlayer(1);
@@ -81,16 +90,16 @@ public class Referee extends AbstractReferee {
         // Send initialization input to players (3=Wood 3, 2=Wood 2, 1=Wood 1)
         int woodDivision = Math.max(1, 4 - leagueLevel);
         for (Player player : gameManager.getActivePlayers()) {
-            player.sendInputLine(String.format("%d %d %d", Grid.WIDTH, Grid.HEIGHT, woodDivision));
+            player.sendInputLine(String.format("%d %d %d", w, h, woodDivision));
         }
     }
 
     private int cellCenterX(int x) {
-        return BOARD_ORIGIN_X + x * CELL_SIZE + CELL_SIZE / 2;
+        return boardOriginX + x * cellSize + cellSize / 2;
     }
 
     private int cellCenterY(int y) {
-        return BOARD_ORIGIN_Y + y * CELL_SIZE + CELL_SIZE / 2;
+        return boardOriginY + y * cellSize + cellSize / 2;
     }
 
     private void initGraphics() {
@@ -101,12 +110,15 @@ public class Referee extends AbstractReferee {
             .setBaseHeight(1080)
             .setZIndex(-10);
 
+        int w = grid.getWidth();
+        int h = grid.getHeight();
+
         // Dark arena backdrop
         graphicEntityModule.createRectangle()
-            .setX(BOARD_ORIGIN_X - 16)
-            .setY(BOARD_ORIGIN_Y - 16)
-            .setWidth(Grid.WIDTH * CELL_SIZE + 32)
-            .setHeight(Grid.HEIGHT * CELL_SIZE + 32)
+            .setX(boardOriginX - 16)
+            .setY(boardOriginY - 16)
+            .setWidth(w * cellSize + 32)
+            .setHeight(h * cellSize + 32)
             .setFillColor(0x111622)
             .setAlpha(0.82)
             .setLineWidth(4)
@@ -191,12 +203,18 @@ public class Referee extends AbstractReferee {
             p.setStatusText(statusTxt);
         }
 
-        // Board Tiles (< 130 sprites)
-        tileSprites = new Sprite[Grid.HEIGHT][Grid.WIDTH];
-        tileOverlayTexts = new Text[Grid.HEIGHT][Grid.WIDTH];
+        // Board Tiles (< 170 sprites across up to 13x13)
+        tileSprites = new Sprite[h][w];
+        tileOverlayTexts = new Text[h][w];
+        int tileSize = cellSize - 4;
+        int beaconSize = (int) Math.round(cellSize * 0.58);
+        int unitSize = (int) Math.round(cellSize * 0.72);
+        int unitLabelSize = Math.max(28, (int) Math.round(cellSize * 0.46));
+        int explosionSize = (int) Math.round(cellSize * 0.95);
+        int pushSize = (int) Math.round(cellSize * 0.80);
 
-        for (int y = 0; y < Grid.HEIGHT; y++) {
-            for (int x = 0; x < Grid.WIDTH; x++) {
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
                 int cx = cellCenterX(x);
                 int cy = cellCenterY(y);
 
@@ -204,8 +222,8 @@ public class Referee extends AbstractReferee {
                     .setX(cx)
                     .setY(cy)
                     .setAnchor(0.5)
-                    .setBaseWidth(CELL_SIZE - 4)
-                    .setBaseHeight(CELL_SIZE - 4)
+                    .setBaseWidth(tileSize)
+                    .setBaseHeight(tileSize)
                     .setZIndex(1);
                 tileSprites[y][x] = s;
                 updateTileSprite(x, y);
@@ -219,8 +237,8 @@ public class Referee extends AbstractReferee {
                 .setX(cellCenterX(b.getX()))
                 .setY(cellCenterY(b.getY()))
                 .setAnchor(0.5)
-                .setBaseWidth(44)
-                .setBaseHeight(44)
+                .setBaseWidth(beaconSize)
+                .setBaseHeight(beaconSize)
                 .setZIndex(4);
             b.setSprite(bs);
             tooltipModule.setTooltipText(bs, String.format("Beacon (%d, %d)\nOwner: Neutral", b.getX(), b.getY()));
@@ -232,13 +250,13 @@ public class Referee extends AbstractReferee {
             Sprite us = graphicEntityModule.createSprite()
                 .setImage(img)
                 .setAnchor(0.5)
-                .setBaseWidth(54)
-                .setBaseHeight(54);
+                .setBaseWidth(unitSize)
+                .setBaseHeight(unitSize);
 
             Text lbl = graphicEntityModule.createText(String.valueOf(u.getId()))
                 .setAnchor(0.5)
                 .setFontFamily("Lato")
-                .setFontSize(36)
+                .setFontSize(unitLabelSize)
                 .setFillColor(0xffffff)
                 .setStrokeThickness(3)
                 .setStrokeColor(0x000000);
@@ -259,16 +277,16 @@ public class Referee extends AbstractReferee {
         fxExplosionPool = graphicEntityModule.createSprite()
             .setImage("explosion.png")
             .setAnchor(0.5)
-            .setBaseWidth(72)
-            .setBaseHeight(72)
+            .setBaseWidth(explosionSize)
+            .setBaseHeight(explosionSize)
             .setVisible(false)
             .setZIndex(15);
 
         fxPushPool = graphicEntityModule.createSprite()
             .setImage("push_fx.png")
             .setAnchor(0.5)
-            .setBaseWidth(60)
-            .setBaseHeight(60)
+            .setBaseWidth(pushSize)
+            .setBaseHeight(pushSize)
             .setVisible(false)
             .setZIndex(14);
 
@@ -283,7 +301,7 @@ public class Referee extends AbstractReferee {
                     .setVisible(false)
                     .setZIndex(6);
             }
-            stormText = graphicEntityModule.createText("CHRONO-STORM: RING r=5 IN 20 TURNS")
+            stormText = graphicEntityModule.createText("CHRONO-STORM: RING k=0 IN 20 TURNS")
                 .setX(960)
                 .setY(1040)
                 .setAnchor(0.5)
@@ -296,55 +314,56 @@ public class Referee extends AbstractReferee {
         }
     }
 
-    private void positionStormBands(int r, int fillColor, double fillAlpha, int lineColor, int lineWidth) {
-        int center = Grid.WIDTH / 2; // 5
-        int minC = center - r;
-        int maxC = center + r;
-        int span = (2 * r + 1) * CELL_SIZE;
-        int innerSpan = Math.max(0, (2 * r - 1) * CELL_SIZE);
-        int leftX = BOARD_ORIGIN_X + minC * CELL_SIZE;
-        int topY = BOARD_ORIGIN_Y + minC * CELL_SIZE;
-        int rightX = BOARD_ORIGIN_X + maxC * CELL_SIZE;
-        int bottomY = BOARD_ORIGIN_Y + maxC * CELL_SIZE;
+    private void positionStormBands(int layer, int fillColor, double fillAlpha, int lineColor, int lineWidth) {
+        int minX = layer;
+        int maxX = grid.getWidth() - 1 - layer;
+        int minY = layer;
+        int maxY = grid.getHeight() - 1 - layer;
+        int spanX = (maxX - minX + 1) * cellSize;
+        int innerSpanY = Math.max(0, (maxY - minY - 1) * cellSize);
+        int leftX = boardOriginX + minX * cellSize;
+        int topY = boardOriginY + minY * cellSize;
+        int rightX = boardOriginX + maxX * cellSize;
+        int bottomY = boardOriginY + maxY * cellSize;
 
         // Top band
-        stormBands[0].setX(leftX).setY(topY).setWidth(span).setHeight(CELL_SIZE)
+        stormBands[0].setX(leftX).setY(topY).setWidth(spanX).setHeight(cellSize)
             .setFillColor(fillColor).setFillAlpha(fillAlpha).setLineColor(lineColor).setLineWidth(lineWidth).setVisible(true);
         // Bottom band
-        stormBands[1].setX(leftX).setY(bottomY).setWidth(span).setHeight(CELL_SIZE)
+        stormBands[1].setX(leftX).setY(bottomY).setWidth(spanX).setHeight(cellSize)
             .setFillColor(fillColor).setFillAlpha(fillAlpha).setLineColor(lineColor).setLineWidth(lineWidth).setVisible(true);
         // Left inner band
-        stormBands[2].setX(leftX).setY(topY + CELL_SIZE).setWidth(CELL_SIZE).setHeight(innerSpan)
-            .setFillColor(fillColor).setFillAlpha(fillAlpha).setLineColor(lineColor).setLineWidth(lineWidth).setVisible(innerSpan > 0);
+        stormBands[2].setX(leftX).setY(topY + cellSize).setWidth(cellSize).setHeight(innerSpanY)
+            .setFillColor(fillColor).setFillAlpha(fillAlpha).setLineColor(lineColor).setLineWidth(lineWidth).setVisible(innerSpanY > 0);
         // Right inner band
-        stormBands[3].setX(rightX).setY(topY + CELL_SIZE).setWidth(CELL_SIZE).setHeight(innerSpan)
-            .setFillColor(fillColor).setFillAlpha(fillAlpha).setLineColor(lineColor).setLineWidth(lineWidth).setVisible(innerSpan > 0);
+        stormBands[3].setX(rightX).setY(topY + cellSize).setWidth(cellSize).setHeight(innerSpanY)
+            .setFillColor(fillColor).setFillAlpha(fillAlpha).setLineColor(lineColor).setLineWidth(lineWidth).setVisible(innerSpanY > 0);
     }
 
-    private void updateStormVisuals(int turn, int hitRing) {
+    private void updateStormVisuals(int turn, int hitLayer) {
         if (leagueLevel < 3 || stormText == null) return;
-        if (hitRing >= 2) {
+        if (hitLayer >= 0) {
             // Impact flash on the ring that just degraded
-            positionStormBands(hitRing, 0xff2a6d, 0.48, 0xffffff, 4);
-            stormText.setText("CHRONO-STORM HITS RING r=" + hitRing + "! (-1 INTEGRITY)")
+            positionStormBands(hitLayer, 0xff2a6d, 0.48, 0xffffff, 4);
+            stormText.setText("CHRONO-STORM HITS RING k=" + hitLayer + "! (-1 INTEGRITY)")
                 .setFillColor(0xff4d6d);
             return;
         }
-        if (collapseRing < 2) {
+        if (collapseLayer > maxCollapseLayer) {
             for (Rectangle b : stormBands) b.setVisible(false);
             stormText.setText("CHRONO-STORM COMPLETE (INNER SANCTUARY SAFE)")
                 .setFillColor(0x90e0ef);
             return;
         }
-        int nextStormTurn = (6 - collapseRing) * 20; // r=5 -> 20, r=4 -> 40, r=3 -> 60, r=2 -> 80
+        int nextStormTurn = (collapseLayer + 1) * 20; // k=0 -> 20, k=1 -> 40, k=2 -> 60, ...
         int turnsLeft = nextStormTurn - turn;
         if (turnsLeft <= 3 && turnsLeft >= 1) {
-            positionStormBands(collapseRing, 0xff9f1c, 0.24, 0xffbe0b, 3);
-            stormText.setText("CHRONO-STORM WARNING: RING r=" + collapseRing + " IN " + turnsLeft + (turnsLeft == 1 ? " TURN!" : " TURNS!"))
+            positionStormBands(collapseLayer, 0xff9f1c, 0.24, 0xffbe0b, 3);
+            stormText.setText("CHRONO-STORM WARNING: RING k=" + collapseLayer + " IN " + turnsLeft + (turnsLeft == 1 ? " TURN!" : " TURNS!"))
                 .setFillColor(0xff9f1c);
         } else {
             for (Rectangle b : stormBands) b.setVisible(false);
-            stormText.setText("CHRONO-STORM: RING r=" + collapseRing + " IN " + turnsLeft + " TURNS")
+            stormText.setText("CHRONO-STORM: RING k=" + collapseLayer + " IN " + turnsLeft + " TURNS")
                 .setFillColor(0xffd166);
         }
     }
@@ -429,12 +448,12 @@ public class Referee extends AbstractReferee {
         resolveBombs();
 
         // 5. Resolve Periodic Arena Ring Collapse in League 3+
-        int hitRing = -1;
-        if (leagueLevel >= 3 && turn > 0 && turn % 20 == 0 && collapseRing >= 2) {
-            hitRing = collapseRing;
+        int hitLayer = -1;
+        if (leagueLevel >= 3 && turn > 0 && turn % 20 == 0 && collapseLayer <= maxCollapseLayer) {
+            hitLayer = collapseLayer;
             resolveRingCollapse();
         }
-        updateStormVisuals(turn, hitRing);
+        updateStormVisuals(turn, hitLayer);
 
         // 6. Capture Beacons & Update Scores
         updateBeaconsAndScores();
@@ -448,7 +467,7 @@ public class Referee extends AbstractReferee {
         int myIdx = player.getIndex();
         player.sendInputLine(String.valueOf(turn));
         // Grid rows
-        for (int y = 0; y < Grid.HEIGHT; y++) {
+        for (int y = 0; y < grid.getHeight(); y++) {
             player.sendInputLine(grid.getRowString(y));
         }
 
@@ -704,8 +723,8 @@ public class Referee extends AbstractReferee {
                 gameManager.addToGameSummary(String.format("%s's Unit %d slammed Unit %d into an obstacle (+2 stun)!",
                     pusher.getOwner().getNicknameToken(), pusher.getId(), target.getId()));
             } else if (!grid.inBounds(nx, ny) || grid.getTile(nx, ny) == Grid.VOID) {
-                target.setX(Math.max(0, Math.min(Grid.WIDTH - 1, nx)));
-                target.setY(Math.max(0, Math.min(Grid.HEIGHT - 1, ny)));
+                target.setX(Math.max(0, Math.min(grid.getWidth() - 1, nx)));
+                target.setY(Math.max(0, Math.min(grid.getHeight() - 1, ny)));
                 eliminateUnit(target, "pushed into the abyss by Unit " + pusher.getId());
                 if (target.getOwner() != pusher.getOwner()) {
                     pusher.getOwner().setScore(pusher.getOwner().getScore() + 15);
@@ -761,12 +780,13 @@ public class Referee extends AbstractReferee {
     }
 
     private void resolveRingCollapse() {
-        int c = collapseRing;
-        int center = Grid.WIDTH / 2;
-        for (int y = 0; y < Grid.HEIGHT; y++) {
-            for (int x = 0; x < Grid.WIDTH; x++) {
-                int chebyshev = Math.max(Math.abs(x - center), Math.abs(y - center));
-                if (chebyshev == c) {
+        int layer = collapseLayer;
+        int w = grid.getWidth();
+        int h = grid.getHeight();
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int edgeDepth = Math.min(Math.min(x, w - 1 - x), Math.min(y, h - 1 - y));
+                if (edgeDepth == layer) {
                     int val = grid.getTile(x, y);
                     if (val == Grid.PILLAR) {
                         grid.setTile(x, y, 1);
@@ -782,8 +802,8 @@ public class Referee extends AbstractReferee {
             }
         }
         gameManager.addToGameSummary(GameManager.formatSuccessMessage(
-            "Chrono-Storm degrades outer ring (radius " + c + ")!"));
-        collapseRing--;
+            "Chrono-Storm degrades outer ring (depth k=" + layer + ")!"));
+        collapseLayer++;
     }
 
     private void handleTileCollapsed(int x, int y, String cause) {
